@@ -10,11 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
 
@@ -24,13 +22,11 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
-      # Run Playwright tests with JSON + HTML reports
+      # Run tests but don't fail yet
       - name: Run Playwright tests
-        id: playwright
-        run: |
-          npx playwright test --reporter=list,json,html || true
+        run: npx playwright test --reporter=list,json,html || true
 
-      # Safely extract failed test count
+      # Get failed test count safely
       - name: Get failed test count
         id: failed_tests
         run: |
@@ -41,23 +37,17 @@ jobs:
           fi
           echo "failed=$FAILED" >> $GITHUB_OUTPUT
 
-      # Upload HTML report even if tests fail
+      # Upload report always
       - name: Upload Playwright HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-html-report
           path: playwright-report
-          retention-days: 7
 
-      # Fail job if there are failed tests
-      - name: Fail if any tests failed
-        if: steps.failed_tests.outputs.failed != '0'
-        run: exit 1
-
-      # Notify Slack only if job fails
+      # 🔔 Slack notification based on failed count
       - name: Notify Slack on failure
-        if: failure()
+        if: steps.failed_tests.outputs.failed != '0'
         uses: slackapi/slack-github-action@v1.25.0
         with:
           payload: |
@@ -68,11 +58,15 @@ jobs:
                   "color": "#ff0000",
                   "fields": [
                     { "title": "Failed tests", "value": "${{ steps.failed_tests.outputs.failed }}", "short": true },
-                    { "title": "Branch", "value": "${{ github.ref_name }}", "short": true },
-                    { "title": "Report", "value": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View HTML report>" }
+                    { "title": "Run", "value": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View report>" }
                   ]
                 }
               ]
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      # ❌ Explicitly fail the job
+      - name: Fail job if tests failed
+        if: steps.failed_tests.outputs.failed != '0'
+        run: exit 1
