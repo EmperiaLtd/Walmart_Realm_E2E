@@ -18,7 +18,7 @@ test.describe("UI navigation", () => {
     await page.waitForTimeout(3000);
 
     await home.clickRealm("Gingerbread Boutique");
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(4000);
 
     await home.clickClose();
 
