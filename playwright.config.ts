@@ -24,18 +24,22 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      testMatch: /^(?!.*iPhone).*\.spec\.ts$/,
     },
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
+      testMatch: /^(?!.*iPhone).*\.spec\.ts$/,
     },
-    // {
-    //   name: 'iPhone',
-    //   use: { ...devices['iPhone 13'] },
-    // },
+    {
+      name: 'iPhone',
+      use: { ...devices['iPhone 13'] },
+      testMatch: /.*iPhone\.spec\.ts$/,
+    },
     {
       name: 'iPad',
       use: { ...devices['iPad Pro'] },
+      testMatch: /^(?!.*iPhone).*\.spec\.ts$/,
     },
   ],
 });
