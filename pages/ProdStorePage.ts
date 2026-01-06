@@ -184,10 +184,6 @@ export class StorePage {
       await this.addProductButton.click({ force: true });
     }
 
-    if (await this.productCloseButton.isVisible()) {
-      await this.productCloseButton.click({ force: true });
-    }
-
     await this.page.waitForTimeout(2000);
   }
 
