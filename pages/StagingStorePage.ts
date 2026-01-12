@@ -264,10 +264,75 @@ export class StorePage {
   }
 
   async waitForVideoToAppear() {
-    const frame = this.page.frameLocator('iframe[title="Experience"]');
-    const video = frame.locator('video[src*="firebase-ugc.emperia.app"]');
-    await video.waitFor({ state: 'visible', timeout: 10000 });
-    await expect(video).toBeVisible();
+    // Wait for the iframe to appear
+    const experienceFrameLocator = this.page.locator('iframe[title="Experience"]');
+    await experienceFrameLocator.first().waitFor({ state: 'attached', timeout: 20000 });
+
+    // Get the iframe's frame
+    const frameElementHandle = await experienceFrameLocator.first().elementHandle();
+    if (!frameElementHandle) throw new Error('Experience iframe element not found');
+    
+    const experienceFrame = await frameElementHandle.contentFrame();
+    if (!experienceFrame) throw new Error('Experience iframe not found');
+
+    // Try to find video in the main experience frame first
+    let video = experienceFrame.locator('video[src*="firebase-ugc.emperia.app"]');
+    const videoCountInMain = await video.count();
+    
+    if (videoCountInMain > 0) {
+      await video.first().waitFor({ state: 'visible', timeout: 10000 });
+      await expect(video.first()).toBeVisible();
+      return;
+    }
+
+    // If not found, check the nested container frame (same structure as openVideo)
+    const containerFrameLocator = experienceFrame.locator('#experience-container');
+    const containerCount = await containerFrameLocator.count();
+    
+    if (containerCount > 0) {
+      await containerFrameLocator.first().waitFor({ state: 'attached', timeout: 10000 });
+      
+      const containerElementHandle = await containerFrameLocator.first().elementHandle();
+      if (containerElementHandle) {
+        const containerFrame = await containerElementHandle.contentFrame();
+        if (containerFrame) {
+          video = containerFrame.locator('video[src*="firebase-ugc.emperia.app"]');
+          await video.first().waitFor({ state: 'visible', timeout: 10000 });
+          await expect(video.first()).toBeVisible();
+          return;
+        }
+      }
+    }
+
+    // Fallback: search recursively in all child frames
+    const searchForVideo = async (frame: any): Promise<boolean> => {
+      if (frame.isDetached()) return false;
+      
+      try {
+        const videoLocator = frame.locator('video[src*="firebase-ugc.emperia.app"]');
+        const count = await videoLocator.count();
+        if (count > 0) {
+          await videoLocator.first().waitFor({ state: 'visible', timeout: 10000 });
+          await expect(videoLocator.first()).toBeVisible();
+          return true;
+        }
+      } catch (error) {
+        // Frame might not be accessible, continue
+      }
+
+      // Recursively check child frames
+      for (const child of frame.childFrames()) {
+        const found = await searchForVideo(child);
+        if (found) return true;
+      }
+
+      return false;
+    };
+
+    const found = await searchForVideo(experienceFrame);
+    if (!found) {
+      throw new Error('Video element not found in any frame');
+    }
   }
 
   async findSparkText(): Promise<Locator | null> {
