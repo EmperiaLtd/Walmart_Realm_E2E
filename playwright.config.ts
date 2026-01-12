@@ -4,6 +4,7 @@ export default defineConfig({
   testDir: './tests',
   timeout: 60 * 1000, 
   retries: 3,
+  workers: 1,
   reporter: 
   [['list'],
    ['html'],
@@ -20,44 +21,25 @@ export default defineConfig({
     navigationTimeout: 60 * 1000,
   },
   projects: [
-    // ------------------------
-    // Desktop browsers
-    // ------------------------
     {
       name: 'chromium',
-      workers: 4, // safe parallelism
-      use: {
-        ...devices['Desktop Chrome'],
-      },
+      use: { ...devices['Desktop Chrome'] },
       testMatch: /^(?!.*iPhone).*\.spec\.ts$/,
     },
     {
       name: 'webkit',
-      workers: 1, // WebKit is slower & flakier in parallel
-      use: {
-        ...devices['Desktop Safari'],
-      },
+      use: { ...devices['Desktop Safari'] },
       testMatch: /^(?!.*iPhone).*\.spec\.ts$/,
     },
-
-    // ------------------------
-    // Mobile
-    // ------------------------
     {
       name: 'iPhone',
-      workers: 2, // mobile should be serial
-      use: {
-        ...devices['iPhone 13'],
-      },
+      use: { ...devices['iPhone 13'] },
       testMatch: /.*iPhone\.spec\.ts$/,
     },
     {
       name: 'iPad',
-      workers: 1,
-      use: {
-        ...devices['iPad Pro'],
-      },
+      use: { ...devices['iPad Pro'] },
       testMatch: /^(?!.*iPhone).*\.spec\.ts$/,
     },
   ],
-});
+})
