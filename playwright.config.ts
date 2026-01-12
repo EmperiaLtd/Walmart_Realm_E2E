@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: './tests',
   timeout: 60 * 1000, 
   retries: 3,
-  workers: 1,
+  workers: 6,
   reporter: 
   [['list'],
    ['html'],
