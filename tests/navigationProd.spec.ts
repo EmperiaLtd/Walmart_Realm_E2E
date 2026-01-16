@@ -66,6 +66,7 @@ test.describe("UI navigation", () => {
 
     await store.clickFindSpark();
     await page.waitForTimeout(2000);
+    page.goto('https://walmartrealm.com/#/viewer/homewithbao/idolvanityedit')
     await home.clickClose();
     await page.waitForTimeout(1000);
 
@@ -76,7 +77,7 @@ test.describe("UI navigation", () => {
        if (!frameElementHandle) throw new Error('Experience iframe element not found');
        const experienceFrame = await frameElementHandle.contentFrame();
        if (!experienceFrame) throw new Error('Experience iframe not found');
-       await experienceFrame.locator('body').click({ position: { x: 775, y:225 } });
+       await experienceFrame.locator('body').click({ position: { x: 845, y:300 } });
 
     await store.clickHiddenRoom();
     
