@@ -2,8 +2,8 @@ name: Daily Realm Tests
 
 on:
   schedule:
-    # Daily at 4pm UK time (BST/GMT safe)
-    - cron: "0 16 * * *"
+    # 10am, Monday to Friday
+    - cron: "0 10 * * 1-5"    
   workflow_dispatch:
 
 jobs:
