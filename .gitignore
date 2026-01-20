@@ -1,7 +1,10 @@
 /test-results
+/playwright.env
 test-results/tests-product-open-product-modal/error-context.md
 /playwright-report
 test-results/.last-run.json
 test-results/tests-checkout-add-product-to-cart-and-verify-cart-count/error-context.md
 
 
+/node_modules
+/perf-results

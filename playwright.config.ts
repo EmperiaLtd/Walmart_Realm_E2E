@@ -1,4 +1,10 @@
+import path from 'path';
+import { config as loadEnv } from 'dotenv';
 import { defineConfig, devices } from '@playwright/test';
+
+// Load playwright.env so PERF_TARGET_URL etc. are available when running tests.
+// (Playwright only auto-loads playwright.env for "codegen", not "test".)
+loadEnv({ path: path.resolve(process.cwd(), 'playwright.env') });
 
 export default defineConfig({
   testDir: './tests',
@@ -29,7 +35,7 @@ export default defineConfig({
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
-      testMatch: /^(?!.*iPhone).*\.spec\.ts$/,
+      testMatch: /^(?!.*(?:iPhone|perf\/)).*\.spec\.ts$/,
     },
     {
       name: 'iPhone',
@@ -39,7 +45,7 @@ export default defineConfig({
     {
       name: 'iPad',
       use: { ...devices['iPad Pro'] },
-      testMatch: /^(?!.*iPhone).*\.spec\.ts$/,
+      testMatch: /^(?!.*(?:iPhone|perf\/)).*\.spec\.ts$/,
     },
   ],
 })
