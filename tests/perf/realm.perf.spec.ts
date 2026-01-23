@@ -13,49 +13,6 @@ function parseTargetUrls(): string[] {
 }
 
 /**
- * Sample real render FPS using requestAnimationFrame
- */
-async function sampleFps(page, durationMs = 3000) {
-  return page.evaluate((duration) => {
-    return new Promise<{
-      avgFps: number;
-      minFps: number;
-      fpsSampleDurationMs: number;
-    }>(resolve => {
-      const frameTimes: number[] = [];
-      let last = performance.now();
-      const start = last;
-
-      function frame(now: number) {
-        frameTimes.push(now - last);
-        last = now;
-
-        if (now - start < duration) {
-          requestAnimationFrame(frame);
-        } else {
-          const fpsValues = frameTimes
-            .filter(t => t > 0)
-            .map(t => 1000 / t);
-
-          const avgFps =
-            fpsValues.reduce((a, b) => a + b, 0) / fpsValues.length || 0;
-
-          const minFps = Math.min(...fpsValues, avgFps || 0);
-
-          resolve({
-            avgFps: Math.round(avgFps),
-            minFps: Math.round(minFps),
-            fpsSampleDurationMs: duration,
-          });
-        }
-      }
-
-      requestAnimationFrame(frame);
-    });
-  }, durationMs);
-}
-
-/**
  * Wait until the Realm iframe and its canvas are actually rendering
  */
 async function waitForRealmCanvas(page) {
@@ -71,6 +28,8 @@ async function waitForRealmCanvas(page) {
 }
 
 test('Walmart Realm performance snapshot', async ({ page }) => {
+  test.setTimeout(120_000); // increase timeout for perf tests
+
   const urls = parseTargetUrls();
 
   const apiCalls: PerfMetrics['apiCalls'] = [];
@@ -143,9 +102,62 @@ test('Walmart Realm performance snapshot', async ({ page }) => {
       });
     });
 
-    // Realm-specific FPS (after iframe + canvas are ready)
+    // Realm-specific FPS (inside the Experience iframe)
     await waitForRealmCanvas(page);
-    const fps = await sampleFps(page, 3000);
+
+    // Wait for the iframe to exist
+    const iframeHandle = await page
+    .locator('iframe[title="Experience"]')
+    .elementHandle();
+
+    if (!iframeHandle) {
+    throw new Error('Experience iframe not found');
+    }
+
+    // Get the real Frame object
+    const frame = await iframeHandle.contentFrame();
+
+    if (!frame) {
+    throw new Error('Unable to resolve Experience iframe frame');
+    }
+
+    // Now you can evaluate INSIDE the iframe
+    const fps = await frame.evaluate((duration) => {
+    return new Promise<{
+      avgFps: number;
+      minFps: number;
+      fpsSampleDurationMs: number;
+    }>(resolve => {
+      const frameTimes: number[] = [];
+      let last = performance.now();
+      const start = last;
+
+      function tick(now: number) {
+        frameTimes.push(now - last);
+        last = now;
+
+        if (now - start < duration) {
+          requestAnimationFrame(tick);
+        } else {
+          const fpsValues = frameTimes
+            .filter(t => t > 0)
+            .map(t => 1000 / t);
+
+          const avgFps =
+            fpsValues.reduce((a, b) => a + b, 0) / fpsValues.length || 0;
+
+          resolve({
+            avgFps: Math.round(avgFps),
+            minFps: Math.round(Math.min(...fpsValues, avgFps || 0)),
+            fpsSampleDurationMs: duration,
+          });
+        }
+      }
+
+      requestAnimationFrame(tick);
+    });
+    }, 3000);
+
 
     const perf: PerfMetrics = {
       url: page.url(),
