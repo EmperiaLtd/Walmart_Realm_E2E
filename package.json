@@ -20,7 +20,13 @@
   "homepage": "https://github.com/RobH25VR/Walmart_Realm_E2E#readme",
   "devDependencies": {
     "@playwright/test": "^1.55.0",
-    "@types/node": "^25.0.9",
-    "dotenv": "^17.2.3"
+    "@types/node": "^25.0.10",
+    "dotenv": "^17.2.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "chart.js": "^4.5.1",
+    "chartjs-node-canvas": "^5.0.0"
   }
 }
