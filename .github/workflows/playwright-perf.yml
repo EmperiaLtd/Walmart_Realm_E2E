@@ -33,8 +33,13 @@ jobs:
           PERF_TARGET_URL: "${{ github.event.inputs.perf_target_url }}"
         run: npx playwright test -c playwright.perf.config.ts
 
+      # --- Compile TypeScript scripts ---
+      - name: Compile TypeScript scripts
+        run: npx tsc
+
+      # --- Run perf graph generator ---
       - name: Generate performance graphs
-        run: npx ts-node ./scripts/generate-perf-graphs.ts
+        run: node ./dist/scripts/generate-perf-graphs.js
 
       - name: Upload perf results
         uses: actions/upload-artifact@v4
