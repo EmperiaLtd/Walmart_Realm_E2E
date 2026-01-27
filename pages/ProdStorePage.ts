@@ -200,7 +200,7 @@ export class StorePage {
 
   async addProduct() {
     await this.page.waitForTimeout(2000);
-
+    await this.addProductButton.scrollIntoViewIfNeeded();
     if (await this.addProductButton.isVisible()) {
       await this.addProductButton.click({ force: true });
     } else{
