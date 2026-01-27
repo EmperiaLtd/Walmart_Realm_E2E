@@ -14,33 +14,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2️⃣ Setup Node
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
+      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: npm ci
 
+      # 4️⃣ Install Playwright browsers
       - name: Install Playwright browsers
         run: npx playwright install chromium --with-deps
 
+      # 5️⃣ Run Playwright performance tests
       - name: Run performance tests
         env:
           PERF_TARGET_URL: "${{ github.event.inputs.perf_target_url }}"
         run: npx playwright test -c playwright.perf.config.ts
 
-      # --- Compile TypeScript scripts ---
+      # 6️⃣ Compile TypeScript scripts
       - name: Compile TypeScript scripts
-        run: npx tsc
+        run: |
+          npx tsc
+          echo "✅ TypeScript compilation finished"
 
-      # --- Run perf graph generator ---
+      # 7️⃣ Debug: list compiled files
+      - name: List compiled scripts
+        run: ls -R dist
+
+      # 8️⃣ Generate performance graphs
       - name: Generate performance graphs
         run: node ./dist/scripts/generate-perf-graphs.js
 
+      # 9️⃣ Upload perf JSON results
       - name: Upload perf results
         uses: actions/upload-artifact@v4
         with:
@@ -48,6 +60,7 @@ jobs:
           path: perf-results
           retention-days: 7
 
+      # 🔟 Upload perf graphs
       - name: Upload perf graphs
         uses: actions/upload-artifact@v4
         with:
