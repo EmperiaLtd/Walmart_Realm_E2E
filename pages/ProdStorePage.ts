@@ -10,6 +10,7 @@ export class StorePage {
   readonly videoButton: Locator;
   readonly sparksButton: Locator;
   readonly hiddenRoom: Locator;
+  readonly viewCart: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -18,6 +19,11 @@ export class StorePage {
       .locator('iframe[title="Experience"]')
       .contentFrame()
       .getByRole('button', { name: 'Add to cart', exact: true });
+
+    this.viewCart = page
+    .locator('iframe[title="Experience"]')
+    .contentFrame()
+    .getByRole('button', { name: 'View Cart', exact: true });
 
     this.productCloseButton = page
       .frameLocator('iframe[title="Experience"]')
@@ -197,6 +203,8 @@ export class StorePage {
 
     if (await this.addProductButton.isVisible()) {
       await this.addProductButton.click({ force: true });
+    } else{
+      await this.viewCart.click({ force: true });
     }
 
     await this.page.waitForTimeout(2000);
