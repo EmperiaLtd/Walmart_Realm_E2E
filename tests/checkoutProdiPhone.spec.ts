@@ -1,24 +1,24 @@
-// import { test, expect } from "@playwright/test";
-// import { HomePage } from "../pages/ProdHomePage";
-// import { StorePage } from "../pages/ProdStorePage";
+import { test, expect } from "@playwright/test";
+import { HomePage } from "../pages/ProdHomePage";
+import { StorePage } from "../pages/ProdStorePage";
 
-// test("add product to cart and verify cart count", async ({ page }) => {
-//     const home = new HomePage(page);
-//     await home.open();
-//     await home.clickRealm("Gingerbread Boutique");
+test("add product to cart and verify cart count", async ({ page }) => {
+    const home = new HomePage(page);
+    await home.open();
+    await home.clickRealm("Gingerbread Boutique");
 
-//     const store = new StorePage(page);
-//     await page.waitForTimeout(4000);
-//     await home.clickClose();
-//     await store.openFirstProductOniPhone();
+    const store = new StorePage(page);
+    await page.waitForTimeout(4000);
+    await home.clickClose();
+    await store.openFirstProductOniPhone();
 
-//     await store.addProduct();
-//     await home.clickClose();
-//     await expect(
-//       page
-//         .locator('iframe[title="Experience"]')
-//         .contentFrame()
-//         .locator('.css-4mn7u8')
-//     ).toHaveText(/^[123]$/);
-// });
+    await store.addProduct();
+    await home.clickClose();
+    await expect(
+      page
+        .locator('iframe[title="Experience"]')
+        .contentFrame()
+        .locator('.css-4mn7u8')
+    ).toHaveText(/^[123]$/);
+});
 

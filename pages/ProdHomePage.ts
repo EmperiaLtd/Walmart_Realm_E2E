@@ -12,7 +12,7 @@ export class HomePage {
   }
 
   async open() {
-    await this.page.goto("https://walmartrealm.com/#/feed");
+    await this.page.goto("https://walmartrealm.emperia.app/#/feed");
   }
 
   async clickRealm(name: string) {
