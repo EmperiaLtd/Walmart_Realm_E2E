@@ -61,7 +61,6 @@ test.describe("UI navigation", () => {
     } else {
       console.log("Spark text not found in experienceFrame");
     }
-    
   });
 });
 
