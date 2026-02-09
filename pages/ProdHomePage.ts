@@ -3,17 +3,24 @@ import { Page, Locator, Frame, FrameLocator } from "@playwright/test";
 export class HomePage {
   readonly page: Page;
   readonly storeCard: Locator;
-  readonly tutorialButton: Locator
+  readonly tutorialButton: Locator;
+  readonly titleCard: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.storeCard = page.locator(".chakra-text");
+    this.titleCard = page.getByText("New shops coming soon");
     this.tutorialButton = page.getByRole('button', { name: 'Close tutorial' });
   }
 
   async open() {
     await this.page.goto("https://walmartrealm.emperia.app/#/feed");
   }
+
+  async openRealm() {
+    await this.page.goto("https://walmartrealm.com/");
+  }
+
 
   async clickRealm(name: string) {
     const store = this.storeCard.filter({ hasText: name });

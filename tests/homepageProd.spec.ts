@@ -13,3 +13,9 @@ test("navigate to homepage and tutorial appears", async ({ page }) => {
   await home.clickRealm("Cyberpunk City");
   await expect(page).toHaveURL(/cyberpunkcity/i); // adjust if needed
 });
+
+test("navigate to realm", async ({ page }) => {
+  const home = new HomePage(page);
+  await home.openRealm();
+  await expect(home.titleCard).toBeVisible();
+});
